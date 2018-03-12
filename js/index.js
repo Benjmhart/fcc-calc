@@ -5,7 +5,9 @@ var currTotal=0;
 var chain=[];
 var charCap=8;
 //function to add numbers or decimal by button press
-$('.numbut').unbind('click').bind('click', function(event){
+$('.numbut').click(clickHandle)
+  
+var clickHandle = function(event){
   //get value of button pressed and assign to newNum variable
   event.stopPropagation()
   var newArr=($(this).html()).split('');
