@@ -1,14 +1,19 @@
-
+  $.debounce = function( delay, at_begin, callback ) {
+    return callback === undefined
+      ? jq_throttle( delay, at_begin, false )
+      : jq_throttle( delay, callback, at_begin !== false );
+  };
 var currTotal=0;
 
 
 var chain=[];
 var charCap=8;
 //function to add numbers or decimal by button press
-  
-var clickHandle = function(event){
+function clickHandle(event){
   //get value of button pressed and assign to newNum variable
-  
+  event.stopImmediatePropagation();
+  console.log('numbut fired')
+  console.log('this', $(this))
   var newArr=($(this).html()).split('');
   if ($(this)[0].attributes.value.value!="."){
     var newNum=Number($(this)[0].attributes.value.value);
@@ -16,8 +21,10 @@ var clickHandle = function(event){
   else{
     var newNum=".";
   }
+  console.log('newnum', newNum)
   //get value of input field id=out
   var oldVal=document.getElementById('out').value;
+  console.log(oldVal)
   //the case for first entry (replace zero) and decimals <1 (insert decimal behind zero)
   if(oldVal==="0"){
     if(newNum==="."){
@@ -26,6 +33,8 @@ var clickHandle = function(event){
     }
     else{
       document.getElementById('out').value=newNum
+      console.log('assigned out value')
+      console.log(document.getElementById('out').value)
     }
   } 
   //the case for subsequent entries (push number) and for decimals greater than 1 (push decimal)
@@ -48,12 +57,17 @@ var clickHandle = function(event){
     }
     pusher=String(pusher.join(''));
     document.getElementById('out').value=pusher;
+    
+      console.log('assigned out value')
+      console.log(document.getElementById('out').value)
   }
   
   
 };
 //function to control user input: prevent letters, prevent second decimal, prevent length >9
 $('#out').keyup(function(event){
+  
+  event.stopImmediatePropagation();
   //get new value of input & split to array
   var newArr=(document.getElementById('out').value.split(''));    
   console.log(newArr)
@@ -82,6 +96,8 @@ $('#out').keyup(function(event){
 //function to add operator & number to chain and keep a running tally.
 //have a case to prevent divide by zero
 $('.opbut').click(function(event){
+  
+  event.stopImmediatePropagation();
   //grab number in 'out'
   var chainNum=Number(document.getElementById('out').value)
   //grab operator
@@ -91,7 +107,7 @@ $('.opbut').click(function(event){
   //sends number and operator onto the chain
   //chain will now be [num 1. op1, num2, op2]
   chain.push(chainNum, operator)
-  console.log(chain);
+  console.log('operation chain', chain);
   //clears the 'msg' and sets 'out' to 0
   document.getElementById('msg').innerHTML='';
   document.getElementById('out').value=0;
@@ -119,6 +135,7 @@ $('.opbut').click(function(event){
 
 //function to get math on 4-item chain
 function getTotal(chain){
+  
   var op=chain[(chain.length)-1];
   if(chain[1]==="+"){
     currTotal=chain[0]+chain[2];
@@ -147,6 +164,8 @@ function getTotal(chain){
 }  
 // clear function
 $('#clear').click(function(event){
+  
+  event.stopImmediatePropagation();
   //empty the chain and set input value to zero 
   chain=[];
   currTotal=0;
@@ -156,4 +175,6 @@ $('#clear').click(function(event){
   document.getElementById('showChain').innerHTML=' ';
 });
 
-$('.numbut').click(clickHandle)
+
+$('.numbut').off().click(clickHandle)
+
