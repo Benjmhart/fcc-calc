@@ -1,124 +1,180 @@
-<!DOCTYPE html>
-<html lang="en" >
+  $.debounce = function( delay, at_begin, callback ) {
+    return callback === undefined
+      ? jq_throttle( delay, at_begin, false )
+      : jq_throttle( delay, callback, at_begin !== false );
+  };
+var currTotal=0;
 
-<head>
-  <meta charset="UTF-8">
-  <title>FreeCodeCamp Calculator</title>
+
+var chain=[];
+var charCap=8;
+//function to add numbers or decimal by button press
+function clickHandle(event){
+  //get value of button pressed and assign to newNum variable
+  event.stopImmediatePropagation();
+  console.log('numbut fired')
+  console.log('this', $(this))
+  var newArr=($(this).html()).split('');
+  if ($(this)[0].attributes.value.value!="."){
+    var newNum=Number($(this)[0].attributes.value.value);
+  }
+  else{
+    var newNum=".";
+  }
+  console.log('newnum', newNum)
+  //get value of input field id=out
+  var oldVal=document.getElementById('out').value;
+  console.log(oldVal)
+  //the case for first entry (replace zero) and decimals <1 (insert decimal behind zero)
+  if(oldVal==="0"){
+    if(newNum==="."){
+      newNum="0."
+      document.getElementById('out').value=newNum;
+    }
+    else{
+      document.getElementById('out').value=newNum
+      console.log('assigned out value')
+      console.log(document.getElementById('out').value)
+    }
+  } 
+  //the case for subsequent entries (push number) and for decimals greater than 1 (push decimal)
+  else {
+    var pusher=oldVal.split('');
+    for(var i=0;i<pusher.length;i++){
+      if(pusher[i]!="."){
+      pusher[i]=Number(pusher[i]);
+      } 
+      //second decimal blocker by buttonpress
+      else if(newNum==="."){
+      return;
+      }
+    }
+    //write new number to input field id OUT
+    pusher.push(newNum);
+    //size boundary
+    if(pusher.length>charCap){
+      return;
+    }
+    pusher=String(pusher.join(''));
+    document.getElementById('out').value=pusher;
+    
+      console.log('assigned out value')
+      console.log(document.getElementById('out').value)
+  }
   
   
-  <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css'>
-
-      <link rel="stylesheet" href="css/style.css">
-
+};
+//function to control user input: prevent letters, prevent second decimal, prevent length >9
+$('#out').keyup(function(event){
   
-</head>
-
-<body>
-
+  event.stopImmediatePropagation();
+  //get new value of input & split to array
+  var newArr=(document.getElementById('out').value.split(''));    
+  console.log(newArr)
+  //check if a previous decimal exists, or if new input is not a number or decimal
+  var hasDec=false;
+  var checker=/[^0-9]/
+  for (var i=0;i<newArr.length;i++){
+    if(checker.test(newArr[i])){
+      newArr[i]='';
+    }
+    if(newArr[i]==="."&&hasDec===true){
+      newArr[i]='';
+    }
+    if(newArr[i]==="."){
+      hasDec=true;
+    }
+  }
   
-<html >
-<head>
-  <meta charset="UTF-8">
-  <title>FreeCodeCamp Calculator</title>
+  //check if length >9 & reset input.
+  if(newArr.length>charCap){
+    newArr.length=charCap;
+  }
+  document.getElementById('out').value=newArr.join('');
+});
+
+//function to add operator & number to chain and keep a running tally.
+//have a case to prevent divide by zero
+$('.opbut').click(function(event){
   
+  event.stopImmediatePropagation();
+  //grab number in 'out'
+  var chainNum=Number(document.getElementById('out').value)
+  //grab operator
+  var operator=String($(this)[0].attributes.value.value);
+  //grab previpir p[eratpr on chain]
+  var lastOp=chain[chain.length-1]
+  //sends number and operator onto the chain
+  //chain will now be [num 1. op1, num2, op2]
+  chain.push(chainNum, operator)
+  console.log('operation chain', chain);
+  //clears the 'msg' and sets 'out' to 0
+  document.getElementById('msg').innerHTML='';
+  document.getElementById('out').value=0;
+  //if there is math to perform
+  if(chain.length>2){
+    //perform math
+    chain=getTotal(chain);
+  }
+  //put everything back together and check if they divided by zero or something
   
+  var chainString=chain.join(' ');
+  if ((chainString.substr(0,3))===("NaN")){
+    //write outputs
+    document.getElementById('showChain').innerHTML='YOU BROKE MATH'
+    chain=[];
+  } else if(chain[1]==='='){
+    document.getElementById('showChain').innerHTML=chain[0];
+    chain=[];
+  }
+  else {
+   document.getElementById('showChain').innerHTML=chainString;
+  }
   
-      <link rel="stylesheet" href="css/style.css">
+  });
 
+//function to get math on 4-item chain
+function getTotal(chain){
   
-</head>
-
-<body>
-  <head>
-</head>
-<body>
-  <div id='calcbody'>
-    <div id='title'>
-      <h1> freeCodeCamp Calculator</h1>
-    </div>
-    <div id=screen>
-      <div id='chain'>
-        <p><span id='msg'>do some math!</span><span id='showChain'></span><span id='total'></span></p>
-      </div>
-      <div id='input'>
-        <input id='out' value='0'></input>
-      </div>
-    </div>
-  <div class='text-center button-grid'>
-        <div id='one' class='btn btn-primary numbut' value='1'>
-          <p>1</p>
-        </div>
-        <div id='two' class='btn btn-primary numbut' value='2'>
-          <p>2</p>
-        </div>
-        <div id='three' class='btn btn-primary numbut' value='3'>
-          <p>3</p>
-        </div>
-        <div id='add' class='btn btn-primary opbut' value='+'>
-          <p>+</p>
-        </div>          
-        <br>
-        <div id='four' class='btn btn-primary numbut' value='4'>
-          <p>4</p>
-        </div>
-        <div id='five' class='btn btn-primary numbut' value='5'>
-          <p>5</p>
-        </div>
-        <div id='six' class='btn btn-primary numbut' value='6'>
-          <p>6</p>        
-        </div>
-        <div id='subtract' class='btn btn-primary opbut' value='-'>
-          <p>-</p>
-        </div>
-        <br>
-        <div id='seven' class='btn btn-primary numbut' value='7'>
-          <p>7</p>
-        </div>
-        <div id='eight' class='btn btn-primary numbut' value='8'>
-          <p>8</p>
-        </div>
-        <div id='nine' class='btn btn-primary numbut' value='9'>
-          <p>9</p>
-        </div>
-        <div id='mult' class='btn btn-primary opbut' value='x'>
-          <p>x</p>
-        </div>
-        <br>  
-        <div id='dec' class='btn btn-primary numbut' value='.'>
-          <p>.</p>
-        </div>       
-        <div id='zero' class='btn btn-primary numbut' value='0'>
-          <p>0</p>
-        </div>    
-        <div id='equals' class='btn btn-primary opbut' value='='>
-          <p>=</p>
-        </div>
-        <div id='divide' class='btn btn-primary opbut' value='/'>
-          <p>/</p>
-        </div>
-        <br>     
-        <div id='clear' class='btn btn-danger' value='C'>
-    <p>CLR</p>
-  </div>
-  </div>
-</div>
-</body>
-  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
-
-    <script  src="js/index.js"></script>
-
-</body>
-</html>
-  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js'></script>
-
+  var op=chain[(chain.length)-1];
+  if(chain[1]==="+"){
+    currTotal=chain[0]+chain[2];
+    chain=[currTotal, op];
+  }
+  else if(chain[1]==="-"){
+    currTotal=chain[0]-chain[2];
+    chain=[currTotal, op];
+  }
+  else if(chain[1]==="x"){
+    currTotal=chain[0]*chain[2];
+    chain=[currTotal, op];
+  }
+  else if(chain[1]==="/"){
+    //if you divided by zero
+    if(chain[2]===0){
+      chain=[];
+    }
+    //normal division
+    currTotal=chain[0]/chain[2];
+    chain=[currTotal, op];
+  }
   
+  return chain;
+  
+}  
+// clear function
+$('#clear').click(function(event){
+  
+  event.stopImmediatePropagation();
+  //empty the chain and set input value to zero 
+  chain=[];
+  currTotal=0;
+  document.getElementById('out').value=0;
+  
+  document.getElementById('msg').innerHTML='do some math!';
+  document.getElementById('showChain').innerHTML=' ';
+});
 
-    <script  src="js/index.js"></script>
 
+$('.numbut').off().click(clickHandle)
 
-
-
-</body>
-
-</html>
