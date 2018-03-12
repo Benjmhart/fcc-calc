@@ -8,6 +8,7 @@ var charCap=8;
 $('.numbut').click(clickHandle)
   
 var clickHandle = function(event){
+  console.log('clickhandle fired')
   //get value of button pressed and assign to newNum variable
   event.stopPropagation()
   var newArr=($(this).html()).split('');
