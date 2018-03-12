@@ -53,7 +53,7 @@ var clickHandle = function(event){
   }
   
   
-});
+};
 //function to control user input: prevent letters, prevent second decimal, prevent length >9
 $('#out').keyup(function(event){
   //get new value of input & split to array
