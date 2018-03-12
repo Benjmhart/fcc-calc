@@ -8,9 +8,8 @@ var charCap=8;
 $('.numbut').click(clickHandle)
   
 var clickHandle = function(event){
-  console.log('clickhandle fired')
   //get value of button pressed and assign to newNum variable
-  event.stopPropagation()
+  
   var newArr=($(this).html()).split('');
   if ($(this)[0].attributes.value.value!="."){
     var newNum=Number($(this)[0].attributes.value.value);
@@ -53,7 +52,7 @@ var clickHandle = function(event){
   }
   
   
-});
+};
 //function to control user input: prevent letters, prevent second decimal, prevent length >9
 $('#out').keyup(function(event){
   //get new value of input & split to array
@@ -157,3 +156,5 @@ $('#clear').click(function(event){
   document.getElementById('msg').innerHTML='do some math!';
   document.getElementById('showChain').innerHTML=' ';
 });
+
+$('.numbut').click(clickHandle)
