@@ -7,7 +7,7 @@ var charCap=8;
 //function to add numbers or decimal by button press
 $('.numbut').click(function(event){
   //get value of button pressed and assign to newNum variable
-  
+  event.stopPropagation()
   var newArr=($(this).html()).split('');
   if ($(this)[0].attributes.value.value!="."){
     var newNum=Number($(this)[0].attributes.value.value);
